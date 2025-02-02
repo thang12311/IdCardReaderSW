@@ -34,6 +34,8 @@ class Ui_HomeWindow(object):
         # self.setupUi(self)
 
     def setupUi(self, HomeWindow):
+        self.flink='https://soundcloud.com/rick-astley-official/never-gonna-give-you-up-4'
+        self.oklink="https://github.com/thang12311/IdCardReaderSW"
         HomeWindow.setObjectName("HomeWindow")
         HomeWindow.resize(1442, 789)
         self.centralwidget = QtWidgets.QWidget(HomeWindow)
@@ -90,6 +92,14 @@ class Ui_HomeWindow(object):
         self.statusbar = QtWidgets.QStatusBar(HomeWindow)
         self.statusbar.setObjectName("statusbar")
         HomeWindow.setStatusBar(self.statusbar)
+        self.link1 = QtWidgets.QLabel(self.centralwidget)
+        self.link1.setGeometry(QtCore.QRect(40, 670, 61, 31))
+        self.link1.setObjectName("link1")
+        self.link1.setOpenExternalLinks(True)
+        self.link2 = QtWidgets.QLabel(self.centralwidget)
+        self.link2.setGeometry(QtCore.QRect(100, 670, 21, 31))
+        self.link2.setObjectName("link2")
+        self.link2.setOpenExternalLinks(True)
 
         self.retranslateUi(HomeWindow)
         QtCore.QMetaObject.connectSlotsByName(HomeWindow)
@@ -101,6 +111,7 @@ class Ui_HomeWindow(object):
         self.SaveFileButton.clicked.connect(self.save_File)
 
     def retranslateUi(self, HomeWindow):
+        linkTemplate="<a href ={0}>{1}</a>"
         self.HomeWindow2=HomeWindow
         _translate = QtCore.QCoreApplication.translate
         HomeWindow.setWindowTitle(_translate("HomeWindow", "Pham mem lap bien ban CCCD"))
@@ -120,6 +131,8 @@ class Ui_HomeWindow(object):
         item = self.IdData_tableWidget.horizontalHeaderItem(4)
         item.setText(_translate("HomeWindow", "Giới Tính"))
         self.PauseButton.setText(_translate("HomeWindow", "TIẾP TỤC"))
+        self.link1.setText(linkTemplate.format(self.flink, "source cod "))
+        self.link2.setText(linkTemplate.format(self.oklink, "e"))
 
     def ProcessingStr(self,ch):
         stt=-1
