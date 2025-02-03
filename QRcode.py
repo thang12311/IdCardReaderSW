@@ -201,7 +201,7 @@ class Ui_HomeWindow(object):
         self.camera(self.pause)
 
     def camera(self, pause):
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
         detector = cv2.QRCodeDetector()
         while cap.isOpened() and self.pause == False:
             _, frame = cap.read()
