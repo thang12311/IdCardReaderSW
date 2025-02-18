@@ -16,6 +16,7 @@ import datetime
 from pyzbar.pyzbar import decode
 import pandas
 import openpyxl
+import winsound
 
 
 class Ui_HomeWindow(object):
@@ -144,19 +145,56 @@ class Ui_HomeWindow(object):
             elif i == len(ch)-1:
                 self.ListData.append(str(ch[stt+1:i]))                             
         self.WriteDataToExcel()
+    
+    def processAddress(self,address):
+        count=0
+        start=0
+        stop=0
+        for i in range (len(address)-1,0,-1):
+            if address[i] == ",":
+                count=count+1
+            if address[i] == "," and count ==2:
+                stop= i
+            elif address[i] == "," and count ==3:
+                start = i+2
+        return address[start:stop]
         
     def WriteDataToExcel(self):
         
+        fone=openpyxl.styles.Font(
+  					name='Times New Roman',
+  					bold=False,
+  					italic=False,
+  					size=13,
+  					
+				)
+        border=openpyxl.styles.Border(top=openpyxl.styles.Side(style='thin'), left=openpyxl.styles.Side(style='thin'), right=openpyxl.styles.Side(style='thin'), bottom=openpyxl.styles.Side(style='thin'))
+
         self.ListData[3]=self.ListData[3][0:2]+"/"+self.ListData[3][2:4]+"/"+self.ListData[3][4:9]
         self.IDCardData={"IDNumber":self.ListData[0], "OldIDNumber":self.ListData[1], "FullName":self.ListData[2],"DayOfBirth":self.ListData[3],"Gender":self.ListData[4],"Adress":self.ListData[5]}
         self.ListData = []
+
+        self.IDCardData["Adress"]=self.processAddress(self.IDCardData.get("Adress"))
         # print(self.IDCardData["IDNumber"])
         # # write data to excel
         work_sheet=self.work_book.active
-        work_sheet.cell(self.row,1).value=self.IDCardData["IDNumber"]
+        work_sheet.cell(self.row,1).value=self.row-3
         work_sheet.cell(self.row,2).value=self.IDCardData["FullName"]
         work_sheet.cell(self.row,3).value=self.IDCardData["DayOfBirth"]
-        work_sheet.cell(self.row,4).value=self.IDCardData["Gender"]
+        work_sheet.cell(self.row,4).value=self.IDCardData["IDNumber"]
+        work_sheet.cell(self.row,5).value=self.IDCardData["Adress"]
+
+        work_sheet.cell(self.row,1).font = fone
+        work_sheet.cell(self.row,2).font = fone
+        work_sheet.cell(self.row,3).font = fone
+        work_sheet.cell(self.row,4).font = fone
+        work_sheet.cell(self.row,5).font = fone
+
+        work_sheet.cell(self.row,1).border = border
+        work_sheet.cell(self.row,2).border = border
+        work_sheet.cell(self.row,3).border = border
+        work_sheet.cell(self.row,4).border = border
+        work_sheet.cell(self.row,5).border = border
 
         # save excel file
         while True:
@@ -201,7 +239,7 @@ class Ui_HomeWindow(object):
         self.camera(self.pause)
 
     def camera(self, pause):
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         detector = cv2.QRCodeDetector()
         while cap.isOpened() and self.pause == False:
             _, frame = cap.read()
@@ -232,7 +270,7 @@ class Ui_HomeWindow(object):
                         self.row=self.row+1
                         self.pause=True
                         self.PauseButton.setDisabled(False)
-                        
+                        winsound.Beep(2500, 1000)
                         # mgs=QtWidgets.QMessageBox()
                         # mgs.setText(barcode[0].data.decode())
                         # x = mgs.exec_()  
@@ -244,18 +282,25 @@ class Ui_HomeWindow(object):
             "border": 1,
             "align": "center",
             "valign": "vcenter",
+            "font_name": "Times New Roman",
+            "font_size": 13,
+            'text_wrap': True
             })
+
         self.worksheet = self.workbook.add_worksheet()
         self.worksheet.set_paper(9)
-        self.worksheet.merge_range("A1:F1","Bien ban giao nhan Can cuoc cong dan ngay "+datetime.date.today().strftime("%d/%m/%Y"))
-        self.worksheet.write(2,0,"Số CCCD",title_format)
-        self.worksheet.set_column(2,0,13)
+        self.worksheet.merge_range("A1:E1","DANH SÁCH BÀN GIAO CĂN CƯỚC CÔNG DÂN CHO MỘT CỬA \nNGAY "+datetime.date.today().strftime("%d/%m/%Y"),title_format)
+        self.worksheet.set_row_pixels(0,60)
+        self.worksheet.write(2,0,"STT",title_format)
+        self.worksheet.set_column(0,0,5)
         self.worksheet.write(2,1,"Họ và tên",title_format)
-        self.worksheet.set_column(2,1,13)
-        self.worksheet.write(2,2,"Ngày tháng năm sinh",title_format)
-        self.worksheet.set_column(2,2,17)
-        self.worksheet.write(2,3,"Giới tính",title_format)
-        self.worksheet.set_column(2,3,10)
+        self.worksheet.set_column(1,1,30)
+        self.worksheet.write(2,2,"Ngày sinh",title_format)
+        self.worksheet.set_column(2,2,12)
+        self.worksheet.write(2,3,"Số CCCD",title_format)
+        self.worksheet.set_column(3,3,15)
+        self.worksheet.write(2,4,"HKTT",title_format)
+        self.worksheet.set_column(4,4,15)
         self.workbook.close()
         self.openfile()
         self.HomeWindow2.setWindowTitle("Pham mem lap bien ban CCCD                     File: "+str(self.filePath))
